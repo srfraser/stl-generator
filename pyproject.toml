@@ -1,0 +1,26 @@
+[project]
+name = "stl-generator"
+version = "0.1.0"
+description = "Generate STL files programmatically or from LLM prompts"
+readme = "README.md"
+authors = [
+    { name = "Simon Fraser", email = "simon@flummox.org" }
+]
+requires-python = ">=3.10"
+dependencies = [
+    "numpy>=1.24.0",
+    "numpy-stl>=3.1.0",
+    "anthropic>=0.34.0",
+]
+
+[project.scripts]
+stl-generator = "stl_generator:main"
+
+[build-system]
+requires = ["uv_build>=0.9.20,<0.10.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.2",
+]
