@@ -2,6 +2,7 @@
 
 from stl_generator.primitives.shapes import (
     cube,
+    box,
     sphere,
     cylinder,
     cone,
@@ -11,6 +12,7 @@ from stl_generator.primitives.shapes import (
 
 __all__ = [
     "cube",
+    "box",
     "sphere",
     "cylinder",
     "cone",
