@@ -1,5 +1,7 @@
 """Helper utilities for working with STL meshes."""
 
+from collections import defaultdict
+
 import numpy as np
 from stl import mesh
 
@@ -29,6 +31,37 @@ def get_mesh_info(stl_mesh: mesh.Mesh) -> dict:
         "max_bounds": max_bounds.tolist(),
         "dimensions": dimensions.tolist(),
     }
+
+
+def is_manifold(stl_mesh: mesh.Mesh) -> tuple[bool, dict]:
+    """
+    Check whether a mesh is manifold (watertight and suitable for 3D printing).
+
+    A manifold mesh has every edge shared by exactly two faces and no
+    boundary or non-manifold edges.
+
+    Args:
+        stl_mesh: The mesh to check
+
+    Returns:
+        tuple[bool, dict]: (is_manifold, non_manifold_edges) where
+            is_manifold is True when the mesh is fully manifold and
+            non_manifold_edges maps each problematic edge to its face count.
+    """
+    edge_count: dict = defaultdict(int)
+
+    for face in stl_mesh.vectors:
+        # Round to 4 decimal places to handle floating-point imprecision
+        v0 = tuple(round(float(x), 4) for x in face[0])
+        v1 = tuple(round(float(x), 4) for x in face[1])
+        v2 = tuple(round(float(x), 4) for x in face[2])
+
+        edge_count[min(v0, v1), max(v0, v1)] += 1
+        edge_count[min(v1, v2), max(v1, v2)] += 1
+        edge_count[min(v2, v0), max(v2, v0)] += 1
+
+    non_manifold_edges = {e: c for e, c in edge_count.items() if c != 2}
+    return len(non_manifold_edges) == 0, non_manifold_edges
 
 
 def visualize_ascii(stl_mesh: mesh.Mesh, width: int = 60, height: int = 30) -> str:
