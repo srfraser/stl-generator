@@ -4,9 +4,10 @@ Generate STL files programmatically or from LLM prompts using Python.
 
 ## Features
 
-- **Primitive Shapes**: Create basic 3D shapes (cube, sphere, cylinder, cone)
+- **Primitive Shapes**: Create basic 3D shapes (cube, box, sphere, cylinder, cone)
 - **Miniature Bases**: Standard 28mm and 32mm bases for tabletop gaming
 - **Scenic Bases**: Flagstone patterns (rectangular, irregular, hexagonal, random) for detailed terrain
+- **Fantasy Terrain**: Dungeon floors, stone walls, and cobblestone streets for 32mm dioramas
 - **Shape Composition**: Combine multiple shapes to create complex objects
 - **Transformations**: Translate, rotate, and scale meshes
 - **LLM Integration**: Generate STL files from natural language descriptions using Claude
@@ -107,6 +108,44 @@ base_custom = flagstone_base_28mm(
 base_custom.save("flagstone_custom.stl")
 ```
 
+### Fantasy Terrain for 32mm Dioramas
+
+Create dungeon floors, stone walls, and cobblestone streets for use in small
+fantasy dioramas (dungeons, towns, gaols, necromancer lairs, etc.).
+All pieces are sized for 32mm miniatures.
+
+```python
+from stl_generator.terrain import (
+    dungeon_floor_tile,
+    dungeon_wall_section,
+    cobblestone_street_tile,
+)
+
+# Dungeon floor tile – 50×50mm with flagstone blocks (default)
+floor = dungeon_floor_tile()
+floor.save("dungeon_floor.stl")
+
+# Wider floor tile for a larger scene
+wide_floor = dungeon_floor_tile(width=100.0, depth=50.0, stone_size=12.0)
+wide_floor.save("dungeon_floor_wide.stl")
+
+# Dungeon wall section – 50mm wide × 40mm tall × 8mm thick
+wall = dungeon_wall_section()
+wall.save("dungeon_wall.stl")
+
+# Taller wall for a dramatic gaol or castle gatehouse
+tall_wall = dungeon_wall_section(width=80.0, height=60.0, course_height=10.0)
+tall_wall.save("dungeon_wall_tall.stl")
+
+# Cobblestone street tile for a fantasy town
+street = cobblestone_street_tile()
+street.save("cobblestone_street.stl")
+
+# Narrower alley tile
+alley = cobblestone_street_tile(width=30.0, depth=50.0, stone_size=6.0)
+alley.save("cobblestone_alley.stl")
+```
+
 ### Combining Shapes
 
 ```python
@@ -183,6 +222,14 @@ Create a cube mesh.
 - `size`: Length of each side
 - `center`: Center point (x, y, z)
 
+#### `box(width, depth, height, center=(0,0,0))`
+Create a rectangular box mesh.
+
+- `width`: Size along the X axis
+- `depth`: Size along the Y axis
+- `height`: Size along the Z axis
+- `center`: Center point (x, y, z)
+
 #### `sphere(radius, center=(0,0,0), resolution=20)`
 Create a sphere mesh.
 
@@ -244,6 +291,39 @@ Create a 32mm base with flagstone pattern. Same parameters as `flagstone_base_28
 #### `add_flagstone_pattern(base_mesh, radius, base_height, pattern="irregular", ...)`
 Add flagstone pattern to any existing base mesh. Useful for decorating custom bases.
 
+### Terrain
+
+#### `dungeon_floor_tile(width=50.0, depth=50.0, thickness=5.0, stone_size=10.0, gap=0.8, stone_height=0.5)`
+Create a rectangular dungeon floor tile with a raised flagstone grid. Scaled for 32mm miniatures.
+
+- `width`: Tile width along X in mm (default 50)
+- `depth`: Tile depth along Y in mm (default 50)
+- `thickness`: Tile thickness in mm (default 5)
+- `stone_size`: Approximate flagstone size in mm (default 10)
+- `gap`: Mortar gap between stones in mm (default 0.8)
+- `stone_height`: How far stones protrude above the tile surface in mm (default 0.5)
+
+#### `dungeon_wall_section(width=50.0, height=40.0, thickness=8.0, course_height=8.0, stone_length=14.0, gap=0.8, relief=0.5)`
+Create a dungeon wall section with embossed stone courses in a staggered ashlar bond. Scaled for 32mm miniatures.
+
+- `width`: Wall width along X in mm (default 50)
+- `height`: Wall height along Z in mm (default 40)
+- `thickness`: Wall thickness along Y in mm (default 8)
+- `course_height`: Height of each stone course in mm (default 8)
+- `stone_length`: Length of each stone block in mm (default 14)
+- `gap`: Mortar gap between stones in mm (default 0.8)
+- `relief`: How far stones protrude from the wall face in mm (default 0.5)
+
+#### `cobblestone_street_tile(width=50.0, depth=50.0, thickness=5.0, stone_size=7.0, gap=0.6, stone_height=0.5)`
+Create a cobblestone street tile with a staggered-row pattern for fantasy towns. Scaled for 32mm miniatures.
+
+- `width`: Tile width along X in mm (default 50)
+- `depth`: Tile depth along Y in mm (default 50)
+- `thickness`: Tile thickness in mm (default 5)
+- `stone_size`: Approximate cobblestone size in mm (default 7)
+- `gap`: Gap between cobblestones in mm (default 0.6)
+- `stone_height`: How far cobblestones protrude above the tile surface in mm (default 0.5)
+
 ### BaseGenerator
 
 #### Methods
@@ -301,6 +381,7 @@ Run tests:
 ```bash
 uv run python tests/test_primitives.py
 uv run python tests/test_scenery.py
+uv run python tests/test_terrain.py
 ```
 
 ## Project Structure
@@ -310,12 +391,15 @@ stl-generator/
 ├── src/
 │   └── stl_generator/
 │       ├── __init__.py
-│       ├── primitives/       # Basic 3D shapes
+│       ├── primitives/       # Basic 3D shapes (cube, box, sphere, …)
 │       │   ├── __init__.py
 │       │   └── shapes.py
 │       ├── scenery/         # Base decorations (flagstones, etc.)
 │       │   ├── __init__.py
 │       │   └── flagstones.py
+│       ├── terrain/         # Terrain for 32mm fantasy dioramas
+│       │   ├── __init__.py
+│       │   └── diorama.py
 │       ├── generators/       # Shape composition and transformations
 │       │   ├── __init__.py
 │       │   └── base.py

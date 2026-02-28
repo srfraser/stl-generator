@@ -243,6 +243,53 @@ def cone(radius: float = 10.0, height: float = 20.0,
     return cone_mesh
 
 
+def box(width: float = 10.0, depth: float = 10.0, height: float = 10.0,
+        center: tuple[float, float, float] = (0, 0, 0)) -> mesh.Mesh:
+    """
+    Create a rectangular box mesh.
+
+    Args:
+        width: Size along the X axis
+        depth: Size along the Y axis
+        height: Size along the Z axis
+        center: Center point (x, y, z)
+
+    Returns:
+        mesh.Mesh: The box mesh
+    """
+    hw = width / 2.0
+    hd = depth / 2.0
+    hh = height / 2.0
+    cx, cy, cz = center
+
+    vertices = np.array([
+        [-hw, -hd, -hh],
+        [+hw, -hd, -hh],
+        [+hw, +hd, -hh],
+        [-hw, +hd, -hh],
+        [-hw, -hd, +hh],
+        [+hw, -hd, +hh],
+        [+hw, +hd, +hh],
+        [-hw, +hd, +hh],
+    ]) + np.array([cx, cy, cz])
+
+    faces = np.array([
+        [0, 3, 1], [1, 3, 2],  # bottom
+        [4, 5, 7], [5, 6, 7],  # top
+        [0, 1, 5], [0, 5, 4],  # front
+        [2, 3, 7], [2, 7, 6],  # back
+        [0, 4, 7], [0, 7, 3],  # left
+        [1, 2, 6], [1, 6, 5],  # right
+    ])
+
+    box_mesh = mesh.Mesh(np.zeros(faces.shape[0], dtype=mesh.Mesh.dtype))
+    for i, face in enumerate(faces):
+        for j in range(3):
+            box_mesh.vectors[i][j] = vertices[face[j]]
+
+    return box_mesh
+
+
 def miniature_base_28mm(center: tuple[float, float, float] = (0, 0, 0),
                         resolution: int = 32) -> mesh.Mesh:
     """
